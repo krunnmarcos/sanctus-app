@@ -1,0 +1,20 @@
+[
+  {
+    "id": "GEN",
+    "name": "Genesis",
+    "abbreviation": "Gn",
+    "category": "Pentateuco",
+    "chapters": [
+      {
+        "number": 1,
+        "verses": [
+          { "id": "GEN:1:1", "number": 1, "text": "In principio creavit Deus caelum et terram." },
+          { "id": "GEN:1:2", "number": 2, "text": "Terra autem erat inanis et vacua, et tenebrae erant super faciem abyssi, et spiritus Dei ferebatur super aquas." },
+          { "id": "GEN:1:3", "number": 3, "text": "Dixitque Deus: Fiat lux. Et facta est lux." },
+          { "id": "GEN:1:4", "number": 4, "text": "Et vidit Deus lucem quod esset bona; et divisit lucem a tenebris." },
+          { "id": "GEN:1:5", "number": 5, "text": "Appellavitque lucem Diem, et tenebras Noctem; factumque est vespere et mane, dies unus." }
+        ]
+      }
+    ]
+  }
+]
