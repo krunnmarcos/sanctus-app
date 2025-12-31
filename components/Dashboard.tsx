@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../App';
-import { Book, PlayCircle, Star, Calendar, ArrowRight, Sun, Sparkles, ExternalLink, Cross } from 'lucide-react';
+import { Book, PlayCircle, Star, ArrowRight, Sun, Sparkles, ExternalLink, Cross, ImageOff, Loader2 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const context = useContext(AppContext);
@@ -10,6 +10,11 @@ const Dashboard: React.FC = () => {
   const [santo, setSanto] = useState<{ nome: string; titulo: string; descricao: string; dataLabel: string; url: string } | null>(null);
   const [santoLoading, setSantoLoading] = useState(true);
   const [santoErro, setSantoErro] = useState(false);
+  const [santoImage, setSantoImage] = useState<string | null>(null);
+  const [santoImageLoading, setSantoImageLoading] = useState(false);
+  const [santoImageError, setSantoImageError] = useState(false);
+
+  const GOOGLE_IMAGE_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 
   const SANTOS_MOCK: Record<string, { nome: string; titulo: string; descricao: string }> = {
     '12-30': {
@@ -59,6 +64,77 @@ const Dashboard: React.FC = () => {
     return { urlDireta, urlBusca: `https://pt.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(nomeFormatado)}` };
   };
 
+  const buildSantoPrompt = (nome: string) => `Create a dramatic Baroque-style portrait of ${nome}. The saint should be portrayed with a contemplative and spiritual expression, wearing traditional religious vestments appropriate to their role (episcopal robes, monastic habit, or period clothing) in rich, ornate colors with intricate details.
+
+The composition must feature authentic Baroque characteristics:
+- Strong chiaroscuro lighting with dramatic contrasts between deep shadows and bright highlights
+- Divine light illuminating the face and key elements from the side or above
+- Dynamic diagonal composition creating visual tension and movement
+
+Include the saint's traditional iconographic attributes and symbols (such as books, crosses, palm branches, lilies, specific tools, or objects historically associated with them). The saint should be shown in a characteristic pose - holding, gesturing toward, or contemplating their primary symbols, with elements like an open Bible, rosary, or other relevant religious items visible.
+
+Background: Dark and atmospheric with rich burgundy, deep brown, and black tones. Include subtle church interior elements, stone columns, or draped fabric creating depth and drama.
+
+Facial features should reflect deep wisdom, spirituality, and divine grace, with a subtle golden halo or divine light radiating behind the head.
+
+Style specifications:
+- Emulate Baroque masters: Caravaggio, Rubens, Murillo, or Zurbarán
+- Rich color palette: deep reds, golds, crimson, browns, blacks, ivory whites
+- Flowing fabrics with realistic folds and luxurious texture
+- Dramatic emotional intensity and spiritual gravitas
+- Photorealistic details with oil painting texture
+- 17th-century European Baroque aesthetic
+- Museum quality composition, masterwork quality
+
+Technical: Oil painting style, dramatic theatrical lighting, golden hour ambiance, cinematic composition, highly detailed, professional quality.`;
+
+  const gerarImagemSanto = async (nome: string) => {
+    if (!GOOGLE_IMAGE_KEY) {
+      setSantoImage(null);
+      setSantoImageError(true);
+      return;
+    }
+    setSantoImageLoading(true);
+    setSantoImageError(false);
+    try {
+      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0:generateImage?key=${GOOGLE_IMAGE_KEY}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          prompt: {
+            text: buildSantoPrompt(nome)
+          },
+          numberOfImages: 1,
+          aspectRatio: '1:1'
+        })
+      });
+
+      if (!resp.ok) {
+        throw new Error(`HTTP ${resp.status}`);
+      }
+
+      const data = await resp.json();
+      const base64 =
+        data?.images?.[0]?.base64 ||
+        data?.candidates?.[0]?.image?.base64 ||
+        data?.candidates?.[0]?.content?.parts?.find((p: any) => p.inlineData)?.inlineData?.data;
+
+      if (!base64) {
+        throw new Error('Imagem não retornada pela API');
+      }
+
+      setSantoImage(`data:image/png;base64,${base64}`);
+    } catch (error) {
+      console.warn('Falha ao gerar imagem do santo:', error);
+      setSantoImageError(true);
+      setSantoImage(null);
+    } finally {
+      setSantoImageLoading(false);
+    }
+  };
+
   useEffect(() => {
     const buscarSanto = async () => {
       const hoje = new Date();
@@ -71,12 +147,14 @@ const Dashboard: React.FC = () => {
         const descricaoApi = extrairDescricaoCurta(data?.sobre_santo) || SANTOS_MOCK[chave]?.descricao || 'Patrono do Sanctus Augustinus. Grande teólogo e filósofo da Igreja.';
         const { urlDireta } = gerarUrlWikipedia(nome);
         setSanto({ nome, titulo: tituloApi, descricao: descricaoApi, dataLabel: formatDateLabel(hoje), url: urlDireta });
+        gerarImagemSanto(nome);
       } catch (err) {
         setSantoErro(true);
         const hoje = new Date();
         const fallback = SANTOS_MOCK[chave] || SANTOS_MOCK['08-28'];
         const { urlDireta } = gerarUrlWikipedia(fallback.nome);
         setSanto({ nome: fallback.nome, titulo: fallback.titulo, descricao: fallback.descricao, dataLabel: formatDateLabel(hoje), url: urlDireta });
+        gerarImagemSanto(fallback.nome);
       } finally {
         setSantoLoading(false);
       }
@@ -251,8 +329,28 @@ const Dashboard: React.FC = () => {
                 <p className="text-sm text-stone-600 dark:text-stone-300">Não foi possível carregar o santo do dia.</p>
               )}
             </div>
-            <div className="w-20 h-20 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-700 dark:text-amber-300 shadow-inner">
-              <Cross size={32} />
+            <div className="w-28 h-28 md:w-32 md:h-32 rounded-2xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-700 dark:text-amber-300 shadow-inner overflow-hidden">
+              {santoImageLoading && (
+                <div className="flex flex-col items-center gap-2 text-amber-700 dark:text-amber-200">
+                  <Loader2 className="animate-spin" size={22} />
+                  <span className="text-[11px] font-semibold">Gerando imagem</span>
+                </div>
+              )}
+              {!santoImageLoading && santoImage && (
+                <img
+                  src={santoImage}
+                  alt={`Retrato de ${santo?.nome || 'santo do dia'}`}
+                  className="w-full h-full object-cover"
+                />
+              )}
+              {!santoImageLoading && !santoImage && (
+                <div className="flex flex-col items-center gap-2 text-amber-700 dark:text-amber-200">
+                  {santoImageError ? <ImageOff size={22} /> : <Cross size={32} />}
+                  <span className="text-[11px] font-semibold text-center px-2 leading-snug">
+                    {santoImageError ? 'Imagem indisponível' : 'Imagem em breve'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </section>
