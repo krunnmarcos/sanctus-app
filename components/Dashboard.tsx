@@ -15,6 +15,7 @@ const Dashboard: React.FC = () => {
   const [santoImageError, setSantoImageError] = useState(false);
 
   const GOOGLE_IMAGE_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
+  const GOOGLE_IMAGE_PROXY = import.meta.env.VITE_IMAGE_PROXY_URL || 'https://generativelanguage.googleapis.com';
 
   const SANTOS_MOCK: Record<string, { nome: string; titulo: string; descricao: string }> = {
     '12-30': {
@@ -64,6 +65,16 @@ const Dashboard: React.FC = () => {
     return { urlDireta, urlBusca: `https://pt.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(nomeFormatado)}` };
   };
 
+  const fetchWithTimeout = async (url: string, ms = 5000) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), ms);
+    try {
+      return await fetch(url, { signal: controller.signal });
+    } finally {
+      clearTimeout(id);
+    }
+  };
+
   const buildSantoPrompt = (nome: string) => `Create a dramatic Baroque-style portrait of ${nome}. The saint should be portrayed with a contemplative and spiritual expression, wearing traditional religious vestments appropriate to their role (episcopal robes, monastic habit, or period clothing) in rich, ornate colors with intricate details.
 
 The composition must feature authentic Baroque characteristics:
@@ -97,7 +108,7 @@ Technical: Oil painting style, dramatic theatrical lighting, golden hour ambianc
     setSantoImageLoading(true);
     setSantoImageError(false);
     try {
-      const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0:generateImage?key=${GOOGLE_IMAGE_KEY}`, {
+      const resp = await fetch(`${GOOGLE_IMAGE_PROXY}/v1beta/models/imagen-3.0:generateImage?key=${GOOGLE_IMAGE_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -140,7 +151,7 @@ Technical: Oil painting style, dramatic theatrical lighting, golden hour ambianc
       const hoje = new Date();
       const chave = `${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
       try {
-        const resp = await fetch('https://liturgiadiaria.site/');
+        const resp = await fetchWithTimeout('https://liturgiadiaria.site/', 4000);
         const data = await resp.json();
         const nome = data?.santo || SANTOS_MOCK[chave]?.nome || 'Santo Agostinho';
         const tituloApi = extrairTitulo(data?.sobre_santo) || SANTOS_MOCK[chave]?.titulo || 'Bispo e Doutor da Igreja';
