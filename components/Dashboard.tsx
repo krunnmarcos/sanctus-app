@@ -394,9 +394,6 @@ const Dashboard: React.FC = () => {
             </p>
             
             <div className="mt-8 flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
-               <button className="px-4 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-full text-sm font-medium hover:bg-stone-700 dark:hover:bg-stone-200 transition-colors">
-                 Meditar
-               </button>
                <button onClick={handleShare} className="px-4 py-2 bg-transparent border border-stone-300 dark:border-stone-600 text-stone-600 dark:text-stone-300 rounded-full text-sm font-medium hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
                  Compartilhar
                </button>
