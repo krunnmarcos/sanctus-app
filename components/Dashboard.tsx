@@ -106,6 +106,89 @@ const Dashboard: React.FC = () => {
   const heroReference = 'João 1:1';
   const heroText = 'No princípio era o Verbo, e o Verbo estava com Deus, e o Verbo era Deus.';
 
+  const loadShareBackground = () => {
+    return new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = '/share-bg.png'; // coloque o PNG anexado em public/share-bg.png
+    });
+  };
+
+  const drawOrnament = (ctx: CanvasRenderingContext2D, x: number, y: number, scale: number) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(scale, scale);
+    ctx.strokeStyle = '#848484';
+    ctx.fillStyle = '#848484';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Linha esquerda
+    ctx.beginPath();
+    ctx.moveTo(10, 20);
+    ctx.lineTo(80, 20);
+    ctx.stroke();
+
+    // Linha direita
+    ctx.beginPath();
+    ctx.moveTo(160, 20);
+    ctx.lineTo(230, 20);
+    ctx.stroke();
+
+    // Arabescos esquerda
+    ctx.beginPath();
+    ctx.moveTo(90, 20);
+    ctx.bezierCurveTo(100, 20, 100, 10, 110, 10);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(90, 20);
+    ctx.bezierCurveTo(100, 20, 100, 30, 110, 30);
+    ctx.stroke();
+
+    // Arabescos direita
+    ctx.beginPath();
+    ctx.moveTo(150, 20);
+    ctx.bezierCurveTo(140, 20, 140, 10, 130, 10);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(150, 20);
+    ctx.bezierCurveTo(140, 20, 140, 30, 130, 30);
+    ctx.stroke();
+
+    // Ornamento central
+    ctx.beginPath();
+    ctx.moveTo(120, 6);
+    ctx.bezierCurveTo(118, 12, 112, 14, 110, 18);
+    ctx.bezierCurveTo(112, 22, 118, 24, 120, 30);
+    ctx.bezierCurveTo(122, 24, 128, 22, 130, 18);
+    ctx.bezierCurveTo(128, 14, 122, 12, 120, 6);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.restore();
+  };
+
+  const drawWrapped = (ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) => {
+    const words = text.split(' ');
+    let line = '';
+    let cursorY = y;
+    for (const word of words) {
+      const testLine = line + word + ' ';
+      const { width: w } = ctx.measureText(testLine);
+      if (w > maxWidth) {
+        ctx.fillText(line.trim(), x, cursorY);
+        line = word + ' ';
+        cursorY += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    if (line.trim()) ctx.fillText(line.trim(), x, cursorY);
+  };
+
   const generateShareImage = async (texto: string, referencia: string) => {
     const canvas = document.createElement('canvas');
     const width = 1080;
@@ -115,49 +198,38 @@ const Dashboard: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
 
-    // Fundo degradê simples
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, '#0f172a');
-    gradient.addColorStop(1, '#3b2f23');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-
-    // Logo texto
-    ctx.fillStyle = '#fbbf24';
-    ctx.font = 'bold 64px "Times New Roman", serif';
-    ctx.fillText('Sanctus', 64, 120);
-
-    // Referência
-    ctx.fillStyle = '#e2e8f0';
-    ctx.font = '600 40px "Georgia", serif';
-    ctx.fillText(referencia, 64, 220);
-
-    // Texto principal com quebra de linha manual
-    ctx.font = '500 42px "Georgia", serif';
-    ctx.fillStyle = '#f8fafc';
-    const maxWidth = width - 128;
-    const lineHeight = 64;
-    const words = texto.split(' ');
-    let line = '';
-    let y = 320;
-    for (const word of words) {
-      const testLine = line + word + ' ';
-      const { width: w } = ctx.measureText(testLine);
-      if (w > maxWidth) {
-        ctx.fillText(line.trim(), 64, y);
-        line = word + ' ';
-        y += lineHeight;
-      } else {
-        line = testLine;
-      }
+    try {
+      const bg = await loadShareBackground();
+      ctx.drawImage(bg, 0, 0, width, height);
+    } catch {
+      const gradient = ctx.createLinearGradient(0, 0, width, height);
+      gradient.addColorStop(0, '#0f172a');
+      gradient.addColorStop(1, '#3b2f23');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
     }
-    if (line.trim()) ctx.fillText(line.trim(), 64, y);
 
-    // Rodapé
-    ctx.font = '500 32px "Arial", sans-serif';
+    // Ornamento superior
+    drawOrnament(ctx, width / 2 - 120, 240, 1.0);
+
+    ctx.fillStyle = '#d9d9d9';
+    ctx.font = 'italic 40px "Georgia", serif';
+    drawWrapped(ctx, `“${texto}”`, 180, 320, width - 360, 60);
+
+    ctx.fillStyle = '#f1f1f1';
+    ctx.font = 'italic 38px "Georgia", serif';
+    ctx.fillText(referencia, 180, 720);
+
     ctx.fillStyle = '#cbd5e1';
-    ctx.fillText('Olha essa passagem que li no app Sanctus', 64, height - 160);
-    ctx.fillText('sanctus.app', 64, height - 100);
+    ctx.font = '400 32px "Georgia", serif';
+    drawWrapped(ctx, 'Acesse o app pelo link: https://sanctus-app.vercel.app/', 180, 820, width - 360, 48);
+
+    ctx.fillStyle = '#9ca3af';
+    ctx.font = '400 28px "Georgia", serif';
+    ctx.fillText('Olha essa passagem que li no app Sanctus', 180, height - 140);
+
+    // Ornamento inferior
+    drawOrnament(ctx, width / 2 - 120, height - 240, 1.0);
 
     return canvas.toDataURL('image/png', 1.0);
   };
