@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../App';
-import { Book, PlayCircle, Star, ArrowRight, Sun, Sparkles, ExternalLink, Cross } from 'lucide-react';
+import { Book, PlayCircle, Star, ArrowRight, Sun, Sparkles, ExternalLink, Cross, X, Download, Share2 } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const context = useContext(AppContext);
@@ -13,6 +13,9 @@ const Dashboard: React.FC = () => {
   const [evangelho, setEvangelho] = useState<{ referencia: string; bookId: string; chapter: number } | null>(null);
   const [evangelhoErro, setEvangelhoErro] = useState(false);
   const [liturgiaLabel, setLiturgiaLabel] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareImage, setShareImage] = useState<string | null>(null);
+  const [shareLoading, setShareLoading] = useState(false);
 
   const SANTOS_MOCK: Record<string, { nome: string; titulo: string; descricao: string }> = {
     '12-30': {
@@ -100,6 +103,71 @@ const Dashboard: React.FC = () => {
     return { urlDireta, urlBusca: `https://pt.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(nomeFormatado)}` };
   };
 
+  const heroReference = 'João 1:1';
+  const heroText = 'No princípio era o Verbo, e o Verbo estava com Deus, e o Verbo era Deus.';
+
+  const generateShareImage = async (texto: string, referencia: string) => {
+    const canvas = document.createElement('canvas');
+    const width = 1080;
+    const height = 1920;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    // Fundo degradê simples
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, '#0f172a');
+    gradient.addColorStop(1, '#3b2f23');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    // Logo texto
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 64px "Times New Roman", serif';
+    ctx.fillText('Sanctus', 64, 120);
+
+    // Referência
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '600 40px "Georgia", serif';
+    ctx.fillText(referencia, 64, 220);
+
+    // Texto principal com quebra de linha manual
+    ctx.font = '500 42px "Georgia", serif';
+    ctx.fillStyle = '#f8fafc';
+    const maxWidth = width - 128;
+    const lineHeight = 64;
+    const words = texto.split(' ');
+    let line = '';
+    let y = 320;
+    for (const word of words) {
+      const testLine = line + word + ' ';
+      const { width: w } = ctx.measureText(testLine);
+      if (w > maxWidth) {
+        ctx.fillText(line.trim(), 64, y);
+        line = word + ' ';
+        y += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    if (line.trim()) ctx.fillText(line.trim(), 64, y);
+
+    // Rodapé
+    ctx.font = '500 32px "Arial", sans-serif';
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillText('Olha essa passagem que li no app Sanctus', 64, height - 160);
+    ctx.fillText('sanctus.app', 64, height - 100);
+
+    return canvas.toDataURL('image/png', 1.0);
+  };
+
+  const dataUrlToFile = async (dataUrl: string, filename: string) => {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: 'image/png' });
+  };
+
   useEffect(() => {
     const buscarSanto = async () => {
       const hoje = new Date();
@@ -169,11 +237,59 @@ const Dashboard: React.FC = () => {
     setView('reader');
   };
 
+  const handleCategoryClick = (cat: string) => {
+    const mapa: Record<string, { bookId: string; chapter: number }> = {
+      Pentateuco: { bookId: 'GEN', chapter: 1 },
+      Salmos: { bookId: 'SL', chapter: 1 },
+      Evangelhos: { bookId: 'MT', chapter: 1 },
+      Cartas: { bookId: 'RM', chapter: 1 },
+    };
+    const destino = mapa[cat];
+    if (destino) {
+      setCurrentBookId(destino.bookId);
+      setCurrentChapter(destino.chapter);
+      setView('reader');
+    }
+  };
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Bom dia";
     if (hour < 18) return "Boa tarde";
     return "Boa noite";
+  };
+
+  const shareMessageRaw = `Olha essa passagem que li no app Sanctus: ${heroReference} - ${heroText}`;
+  const shareMessage = encodeURIComponent(shareMessageRaw);
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${shareMessage}`;
+
+  const handleShare = async () => {
+    try {
+      setShareLoading(true);
+      const img = await generateShareImage(heroText, heroReference);
+      setShareImage(img);
+
+      const supportsWebShare = typeof navigator !== 'undefined' && !!navigator.canShare;
+      if (supportsWebShare && img) {
+        const file = await dataUrlToFile(img, 'sanctus-compartilhar.png');
+        const canShareFile = navigator.canShare && navigator.canShare({ files: [file] });
+        if (canShareFile) {
+          await navigator.share({
+            files: [file],
+            text: shareMessageRaw,
+            title: 'Sanctus',
+          });
+          return; // Compartilhado via Web Share, não abre modal
+        }
+      }
+
+      // Fallback: abre modal com prévia e links
+      setShareOpen(true);
+    } catch (err) {
+      setShareOpen(true);
+    } finally {
+      setShareLoading(false);
+    }
   };
 
   return (
@@ -217,7 +333,7 @@ const Dashboard: React.FC = () => {
                <button className="px-4 py-2 bg-stone-900 dark:bg-stone-100 text-white dark:text-stone-900 rounded-full text-sm font-medium hover:bg-stone-700 dark:hover:bg-stone-200 transition-colors">
                  Meditar
                </button>
-               <button className="px-4 py-2 bg-transparent border border-stone-300 dark:border-stone-600 text-stone-600 dark:text-stone-300 rounded-full text-sm font-medium hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
+               <button onClick={handleShare} className="px-4 py-2 bg-transparent border border-stone-300 dark:border-stone-600 text-stone-600 dark:text-stone-300 rounded-full text-sm font-medium hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors">
                  Compartilhar
                </button>
             </div>
@@ -283,7 +399,8 @@ const Dashboard: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {['Pentateuco', 'Salmos', 'Evangelhos', 'Cartas'].map((cat) => (
               <button 
-                key={cat} 
+                key={cat}
+                onClick={() => handleCategoryClick(cat)}
                 className="group p-4 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl hover:border-gold-300 dark:hover:border-gold-700 hover:shadow-md transition-all text-left"
               >
                 <span className="block w-8 h-1 bg-gold-400 rounded-full mb-3 group-hover:w-12 transition-all"></span>
@@ -340,6 +457,60 @@ const Dashboard: React.FC = () => {
         </section>
 
       </div>
+
+      {shareOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl max-w-3xl w-full p-4 md:p-6 relative">
+            <button
+              onClick={() => setShareOpen(false)}
+              className="absolute top-3 right-3 p-2 rounded-full text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800"
+              aria-label="Fechar compartilhamento"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="flex flex-col gap-4 md:gap-6">
+              <div className="flex items-center gap-2 text-sm font-semibold text-stone-500 uppercase tracking-wide">
+                <Share2 size={14} />
+                <span>Compartilhar</span>
+              </div>
+
+              <div className="bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl p-3 flex justify-center">
+                {shareLoading ? (
+                  <div className="h-[320px] w-full max-w-[360px] bg-stone-200 dark:bg-stone-700 animate-pulse rounded-lg" />
+                ) : shareImage ? (
+                  <img src={shareImage} alt="Prévia de compartilhamento" className="max-h-[420px] rounded-lg shadow-md" />
+                ) : (
+                  <div className="h-[320px] w-full max-w-[360px] bg-stone-200 dark:bg-stone-700 rounded-lg flex items-center justify-center text-stone-500">
+                    Não foi possível gerar a imagem
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700"
+                >
+                  Compartilhar no WhatsApp
+                </a>
+                {shareImage && (
+                  <a
+                    href={shareImage}
+                    download="sanctus-compartilhar.png"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-900 text-white font-semibold hover:bg-stone-800"
+                  >
+                    <Download size={16} />
+                    Baixar imagem
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

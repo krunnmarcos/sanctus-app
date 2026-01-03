@@ -9,7 +9,8 @@ import {
   Type,
   Maximize2,
   Minimize2,
-  BookOpen
+  BookOpen,
+  Download
 } from 'lucide-react';
 import { AppContext } from '../App';
 import { THEME_COLORS, PATRISTIC_COMMENTS } from '../constants';
@@ -36,6 +37,11 @@ const Reader: React.FC = () => {
   const [lectioMode, setLectioMode] = useState(false);
   const [fontSize, setFontSize] = useState(18); // px
   const [showSettings, setShowSettings] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareImage, setShareImage] = useState<string | null>(null);
+  const [shareLoading, setShareLoading] = useState(false);
+  const [shareRef, setShareRef] = useState('');
+  const [shareText, setShareText] = useState('');
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -89,9 +95,96 @@ const Reader: React.FC = () => {
     }
   };
 
+  const generateShareImage = async (texto: string, referencia: string) => {
+    const canvas = document.createElement('canvas');
+    const width = 1080;
+    const height = 1920;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    const gradient = ctx.createLinearGradient(0, 0, width, height);
+    gradient.addColorStop(0, '#0f172a');
+    gradient.addColorStop(1, '#3b2f23');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    ctx.fillStyle = '#fbbf24';
+    ctx.font = 'bold 64px "Times New Roman", serif';
+    ctx.fillText('Sanctus', 64, 120);
+
+    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '600 40px "Georgia", serif';
+    ctx.fillText(referencia, 64, 220);
+
+    ctx.font = '500 42px "Georgia", serif';
+    ctx.fillStyle = '#f8fafc';
+    const maxWidth = width - 128;
+    const lineHeight = 64;
+    const words = texto.split(' ');
+    let line = '';
+    let y = 320;
+    for (const word of words) {
+      const testLine = line + word + ' ';
+      const { width: w } = ctx.measureText(testLine);
+      if (w > maxWidth) {
+        ctx.fillText(line.trim(), 64, y);
+        line = word + ' ';
+        y += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    if (line.trim()) ctx.fillText(line.trim(), 64, y);
+
+    ctx.font = '500 32px "Arial", sans-serif';
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillText('Olha essa passagem que li no app Sanctus', 64, height - 160);
+    ctx.fillText('sanctus.app', 64, height - 100);
+
+    return canvas.toDataURL('image/png', 1.0);
+  };
+
+  const dataUrlToFile = async (dataUrl: string, filename: string) => {
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    return new File([blob], filename, { type: 'image/png' });
+  };
+
+  const handleShareVerse = async (verse: Verse) => {
+    const reference = `${currentBook?.abbreviation || currentBook?.name || 'Livro'} ${currentChapter}, ${verse.number}`;
+    const messageRaw = `Olha essa passagem que li no app Sanctus: ${reference} — ${verse.text}`;
+    setShareRef(reference);
+    setShareText(verse.text);
+    try {
+      setShareLoading(true);
+      const img = await generateShareImage(verse.text, reference);
+      setShareImage(img);
+
+      const supportsWebShare = typeof navigator !== 'undefined' && !!navigator.canShare;
+      if (supportsWebShare && img) {
+        const file = await dataUrlToFile(img, 'sanctus-compartilhar.png');
+        const canShareFile = navigator.canShare && navigator.canShare({ files: [file] });
+        if (canShareFile) {
+          await navigator.share({ files: [file], text: messageRaw, title: 'Sanctus' });
+          return;
+        }
+      }
+
+      setShareOpen(true);
+    } catch (err) {
+      setShareOpen(true);
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
   if (!currentBook || !chapterData) {
     return <div className="p-8 text-center text-stone-500">Livro ou capítulo não encontrado.</div>;
   }
+
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Olha essa passagem que li no app Sanctus: ${shareRef} — ${shareText}`)}`;
 
   return (
     <div className={`h-full flex flex-col relative ${lectioMode ? 'z-50 bg-paper-light dark:bg-paper-dark absolute inset-0' : ''}`}>
@@ -200,7 +293,11 @@ const Reader: React.FC = () => {
                         <button onClick={() => handleHighlight('pink')} className="w-5 h-5 rounded-full bg-rose-400 hover:scale-110 transition-transform" />
                         <button onClick={() => removeHighlight(verse.id)} className="w-5 h-5 rounded-full bg-white text-stone-900 flex items-center justify-center hover:scale-110 transition-transform"><X size={12} /></button>
                       </div>
-                      <button className="p-1.5 hover:bg-stone-700 rounded transition-colors" title="Compartilhar">
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleShareVerse(verse); }}
+                        className="p-1.5 hover:bg-stone-700 rounded transition-colors" 
+                        title="Compartilhar"
+                      >
                         <Share2 size={14} />
                       </button>
                       {hasComments && (
@@ -301,6 +398,60 @@ const Reader: React.FC = () => {
                      </div>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {shareOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
+          <div className="bg-white dark:bg-stone-900 rounded-2xl shadow-2xl max-w-3xl w-full p-4 md:p-6 relative">
+            <button
+              onClick={() => setShareOpen(false)}
+              className="absolute top-3 right-3 p-2 rounded-full text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800"
+              aria-label="Fechar compartilhamento"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="flex flex-col gap-4 md:gap-6">
+              <div className="flex items-center gap-2 text-sm font-semibold text-stone-500 uppercase tracking-wide">
+                <Share2 size={14} />
+                <span>Compartilhar</span>
+              </div>
+
+              <div className="bg-stone-50 dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl p-3 flex justify-center">
+                {shareLoading ? (
+                  <div className="h-[320px] w-full max-w-[360px] bg-stone-200 dark:bg-stone-700 animate-pulse rounded-lg" />
+                ) : shareImage ? (
+                  <img src={shareImage} alt="Prévia de compartilhamento" className="max-h-[420px] rounded-lg shadow-md" />
+                ) : (
+                  <div className="h-[320px] w-full max-w-[360px] bg-stone-200 dark:bg-stone-700 rounded-lg flex items-center justify-center text-stone-500">
+                    Não foi possível gerar a imagem
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700"
+                >
+                  Compartilhar no WhatsApp
+                </a>
+                {shareImage && (
+                  <a
+                    href={shareImage}
+                    download="sanctus-compartilhar.png"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-900 text-white font-semibold hover:bg-stone-800"
+                  >
+                    <Download size={16} />
+                    Baixar imagem
+                  </a>
+                )}
               </div>
             </div>
           </div>
