@@ -5,11 +5,14 @@ import { Book, PlayCircle, Star, ArrowRight, Sun, Sparkles, ExternalLink, Cross 
 const Dashboard: React.FC = () => {
   const context = useContext(AppContext);
   if (!context) return null;
-  const { setCurrentBookId, setView, theme } = context;
+  const { setCurrentBookId, setCurrentChapter, setView, theme, bible } = context;
 
   const [santo, setSanto] = useState<{ nome: string; titulo: string; descricao: string; dataLabel: string; url: string } | null>(null);
   const [santoLoading, setSantoLoading] = useState(true);
   const [santoErro, setSantoErro] = useState(false);
+  const [evangelho, setEvangelho] = useState<{ referencia: string; bookId: string; chapter: number } | null>(null);
+  const [evangelhoErro, setEvangelhoErro] = useState(false);
+  const [liturgiaLabel, setLiturgiaLabel] = useState<string | null>(null);
 
   const SANTOS_MOCK: Record<string, { nome: string; titulo: string; descricao: string }> = {
     '12-30': {
@@ -53,6 +56,44 @@ const Dashboard: React.FC = () => {
     return 'Santo(a)';
   };
 
+  const normalizarAbreviacao = (valor: string) => valor
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+
+  const encontrarLivroPorAbreviacao = (abreviacao: string) => {
+    const alvo = normalizarAbreviacao(abreviacao);
+
+    // Heurística para diferenciar Jo (João) de Jó (Jó/Job): prioriza o Evangelho de João.
+    if (alvo === 'jo') {
+      const evangelhoJoao = bible.find((livro) => livro.id === 'JO');
+      if (evangelhoJoao) return evangelhoJoao;
+    }
+
+    return bible.find((livro) => normalizarAbreviacao(livro.abbreviation).startsWith(alvo));
+  };
+
+  const extrairLivroECapitulo = (referencia: string) => {
+    const partes = referencia.trim().split(/\s+/);
+    const abreviacao = partes[0]?.replace(/\.$/, '') || '';
+    const livro = encontrarLivroPorAbreviacao(abreviacao);
+    const capMatch = referencia.match(/(\d+)/);
+    const chapter = capMatch ? parseInt(capMatch[1], 10) || 1 : 1;
+    if (livro) return { bookId: livro.id, chapter };
+    return null;
+  };
+
+  const getDayOfYear = () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), 0, 0);
+    const diff = now.getTime() - start.getTime();
+    const oneDay = 1000 * 60 * 60 * 24;
+    const day = Math.floor(diff / oneDay);
+    const isLeap = new Date(now.getFullYear(), 1, 29).getMonth() === 1;
+    return { day, daysInYear: isLeap ? 366 : 365 };
+  };
+
   const gerarUrlWikipedia = (nome: string) => {
     const nomeFormatado = nome.normalize('NFD').replace(/\p{Diacritic}/gu, '');
     const urlDireta = `https://pt.wikipedia.org/wiki/${encodeURIComponent(nome)}`;
@@ -87,9 +128,44 @@ const Dashboard: React.FC = () => {
     buscarSanto();
   }, []);
 
+  useEffect(() => {
+    const buscarEvangelho = async () => {
+      try {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 5000);
+        const resp = await fetch('https://liturgia.up.railway.app/v2/', { signal: controller.signal });
+        clearTimeout(timer);
+        if (!resp.ok) throw new Error('Falha ao carregar evangelho');
+        const data = await resp.json();
+        setLiturgiaLabel(data?.liturgia || null);
+        const lista = data?.leituras?.evangelho || data?.evangelho;
+        const item = Array.isArray(lista) ? lista[0] : undefined;
+        const referencia = item?.referencia || 'Mt 5, 1-12';
+        const mapeado = extrairLivroECapitulo(referencia);
+        setEvangelho({
+          referencia,
+          bookId: mapeado?.bookId || 'MT',
+          chapter: mapeado?.chapter || 1,
+        });
+      } catch (err) {
+        setEvangelhoErro(true);
+        setLiturgiaLabel('Liturgia do Dia');
+        setEvangelho({ referencia: 'Jo 1, 1-5', bookId: 'JO', chapter: 1 });
+      }
+    };
+    buscarEvangelho();
+  }, [bible]);
+
   const handleContinueReading = () => {
     // In a real app, use stored progress
     setCurrentBookId('GEN'); 
+    setView('reader');
+  };
+
+  const handleGoToEvangelho = () => {
+    const alvo = evangelho || { bookId: 'MT', chapter: 5 };
+    setCurrentBookId(alvo.bookId);
+    setCurrentChapter(alvo.chapter);
     setView('reader');
   };
 
@@ -181,18 +257,21 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-bordeaux text-white rounded-xl p-6 shadow-sm relative overflow-hidden">
+           <div className="bg-bordeaux text-white rounded-xl p-6 shadow-sm relative overflow-hidden">
              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-             <div className="relative z-10 flex flex-col h-full justify-between">
+             <div className="relative z-10 flex flex-col h-full justify-between gap-4">
                 <div>
-                   <h3 className="font-display font-semibold text-lg mb-1">Plano Diário</h3>
-                   <p className="text-white/70 text-sm">Dia 12 de 365</p>
+                 <h3 className="font-display font-semibold text-lg mb-1">Liturgia do Dia</h3>
+                 <p className="text-white/70 text-sm">{liturgiaLabel || 'Liturgia do Dia'}</p>
                 </div>
-                <div>
-                   <p className="font-serif text-2xl mb-1">Salmos 23</p>
-                   <button className="text-xs font-medium uppercase tracking-wide opacity-80 hover:opacity-100 flex items-center gap-1 mt-2">
-                     Ler agora <ArrowRight size={12} />
-                   </button>
+                <div className="space-y-3">
+                 <p className="font-serif text-2xl">{evangelho?.referencia || 'Carregando evangelho...'}</p>
+                 <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide opacity-80">
+                  {evangelhoErro && <span className="text-red-200">Modo offline</span>}
+                  <button onClick={handleGoToEvangelho} className="hover:opacity-100 flex items-center gap-1 mt-2">
+                    Ler agora <ArrowRight size={12} />
+                  </button>
+                 </div>
                 </div>
              </div>
           </div>
