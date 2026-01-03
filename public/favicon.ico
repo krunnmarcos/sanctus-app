@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Sanctus icon">
+  <rect width="64" height="64" rx="12" ry="12" fill="#0f0d0a" />
+  <g transform="translate(32 32)">
+    <circle r="22" fill="#b8860b" fill-opacity="0.12" />
+    <path d="M-3 -18 h6 v12 h12 v6 h-12 v12 h-6 v-12 h-12 v-6 h12z" fill="#b8860b" />
+  </g>
+</svg>
