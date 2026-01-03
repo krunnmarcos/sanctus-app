@@ -235,7 +235,7 @@ const LectioDivina: React.FC = () => {
   const renderProgress = () => {
     const items = visibleSteps;
     return (
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 text-[11px] sm:text-xs">
         {items.map((s, idx) => {
           const icons: Record<StepKey, JSX.Element> = {
             lectio: <BookOpen size={14} />,
@@ -250,7 +250,7 @@ const LectioDivina: React.FC = () => {
             <button
               key={s}
               onClick={() => goToStep(s)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition-colors ${active ? 'bg-amber-100/80 border-amber-300 text-amber-800 dark:bg-indigo-900/40 dark:border-indigo-700 dark:text-indigo-100' : done ? 'bg-stone-100 border-stone-200 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200' : 'bg-white border-stone-200 text-stone-500 dark:bg-stone-900 dark:border-stone-800 dark:text-stone-400'}`}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${active ? 'bg-amber-100/80 border-amber-300 text-amber-800 dark:bg-indigo-900/40 dark:border-indigo-700 dark:text-indigo-100' : done ? 'bg-stone-100 border-stone-200 text-stone-600 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-200' : 'bg-white border-stone-200 text-stone-500 dark:bg-stone-900 dark:border-stone-800 dark:text-stone-400'}`}
             >
               {icons[s]}
               <span className="capitalize">{s}</span>
@@ -308,8 +308,8 @@ const LectioDivina: React.FC = () => {
       {renderPassageHeader()}
       <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center dark:bg-indigo-900/50 dark:text-indigo-100">
-            <BookOpen size={22} />
+          <div className="w-11 h-11 sm:w-12 sm:h-12 aspect-square rounded-full bg-amber-100 text-amber-800 flex items-center justify-center dark:bg-indigo-900/50 dark:text-indigo-100">
+            <BookOpen size={20} />
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-stone-400">Lectio</p>
@@ -347,8 +347,8 @@ const LectioDivina: React.FC = () => {
       {renderPassageHeader()}
       <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center dark:bg-indigo-900/50 dark:text-indigo-100">
-            <Brain size={22} />
+          <div className="w-11 h-11 sm:w-12 sm:h-12 aspect-square rounded-full bg-amber-100 text-amber-800 flex items-center justify-center dark:bg-indigo-900/50 dark:text-indigo-100">
+            <Brain size={20} />
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-stone-400">Meditatio</p>
@@ -390,8 +390,8 @@ const LectioDivina: React.FC = () => {
     <div className="space-y-4">
       <div className="rounded-2xl bg-gradient-to-br from-amber-50 to-white dark:from-indigo-950 dark:to-stone-900 border border-amber-100 dark:border-indigo-900 p-6 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center dark:bg-indigo-900/50 dark:text-indigo-100">
-            <HandHeart size={22} />
+          <div className="w-11 h-11 sm:w-12 sm:h-12 aspect-square rounded-full bg-amber-100 text-amber-800 flex items-center justify-center dark:bg-indigo-900/50 dark:text-indigo-100">
+            <HandHeart size={20} />
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-stone-400">Oratio</p>
@@ -432,8 +432,8 @@ const LectioDivina: React.FC = () => {
     <div className="space-y-4">
       <div className="rounded-2xl bg-gradient-to-br from-stone-900 via-indigo-900 to-stone-950 text-indigo-100 border border-indigo-800 p-6 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-white/10 text-indigo-100 flex items-center justify-center">
-            <Flame size={22} />
+          <div className="w-11 h-11 sm:w-12 sm:h-12 aspect-square rounded-full bg-white/10 text-indigo-100 flex items-center justify-center">
+            <Flame size={20} />
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-indigo-200/80">Contemplatio</p>
@@ -498,8 +498,8 @@ const LectioDivina: React.FC = () => {
     <div className="space-y-4">
       <div className="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center dark:bg-indigo-900/50 dark:text-indigo-100">
-            <Footprints size={22} />
+          <div className="w-11 h-11 sm:w-12 sm:h-12 aspect-square rounded-full bg-amber-100 text-amber-800 flex items-center justify-center dark:bg-indigo-900/50 dark:text-indigo-100">
+            <Footprints size={20} />
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-stone-400">Actio</p>
@@ -582,8 +582,8 @@ const LectioDivina: React.FC = () => {
     <div className="space-y-4">
       <div className="rounded-2xl bg-amber-50 dark:bg-indigo-950 border border-amber-200 dark:border-indigo-900 p-6 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center dark:bg-indigo-800 dark:text-indigo-100">
-            <Star size={22} />
+          <div className="w-11 h-11 sm:w-12 sm:h-12 aspect-square rounded-full bg-amber-200 text-amber-900 flex items-center justify-center dark:bg-indigo-800 dark:text-indigo-100">
+            <Star size={20} />
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-amber-700 dark:text-indigo-200">Lectio concluída</p>
@@ -640,9 +640,9 @@ const LectioDivina: React.FC = () => {
 
   const renderIntro = () => (
     <div className="rounded-3xl bg-gradient-to-br from-amber-100 via-white to-amber-50 dark:from-indigo-950 dark:via-stone-900 dark:to-indigo-900 border border-amber-200/70 dark:border-indigo-900 p-6 shadow-sm">
-      <div className="flex items-start gap-3">
-        <div className="w-12 h-12 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center dark:bg-indigo-800 dark:text-indigo-100">
-          <Sparkles size={22} />
+        <div className="flex items-start gap-3">
+          <div className="w-11 h-11 sm:w-12 sm:h-12 aspect-square rounded-full bg-amber-200 text-amber-900 flex items-center justify-center dark:bg-indigo-800 dark:text-indigo-100">
+            <Sparkles size={20} />
         </div>
         <div className="space-y-2">
           <p className="text-xs uppercase tracking-wide text-amber-700 dark:text-indigo-200 font-semibold">Lectio Divina</p>
