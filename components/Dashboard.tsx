@@ -220,14 +220,6 @@ const Dashboard: React.FC = () => {
     ctx.font = 'italic 38px "Georgia", serif';
     ctx.fillText(referencia, 180, 720);
 
-    ctx.fillStyle = '#cbd5e1';
-    ctx.font = '400 32px "Georgia", serif';
-    drawWrapped(ctx, 'Acesse o app pelo link: https://sanctus-app.vercel.app/', 180, 820, width - 360, 48);
-
-    ctx.fillStyle = '#9ca3af';
-    ctx.font = '400 28px "Georgia", serif';
-    ctx.fillText('Olha essa passagem que li no app Sanctus', 180, height - 140);
-
     // Ornamento inferior
     drawOrnament(ctx, width / 2 - 120, height - 240, 1.0);
 
@@ -331,7 +323,7 @@ const Dashboard: React.FC = () => {
     return "Boa noite";
   };
 
-  const shareMessageRaw = `Olha essa passagem que li no app Sanctus: ${heroReference} - ${heroText}`;
+  const shareMessageRaw = `Olha essa passagem que li no app Sanctus: ${heroReference} - ${heroText}\nAcesse o app pelo link: https://sanctus-app.vercel.app/`;
   const shareMessage = encodeURIComponent(shareMessageRaw);
   const whatsappUrl = `https://api.whatsapp.com/send?text=${shareMessage}`;
 

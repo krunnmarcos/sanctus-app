@@ -201,14 +201,6 @@ const Reader: React.FC = () => {
     ctx.font = 'italic 38px "Georgia", serif';
     ctx.fillText(referencia, 180, 720);
 
-    ctx.fillStyle = '#cbd5e1';
-    ctx.font = '400 32px "Georgia", serif';
-    drawWrapped(ctx, 'Acesse o app pelo link: https://sanctus-app.vercel.app/', 180, 820, width - 360, 48);
-
-    ctx.fillStyle = '#9ca3af';
-    ctx.font = '400 28px "Georgia", serif';
-    ctx.fillText('Olha essa passagem que li no app Sanctus', 180, height - 140);
-
     drawOrnament(ctx, width / 2 - 120, height - 240, 1.0);
 
     return canvas.toDataURL('image/png', 1.0);
@@ -222,7 +214,7 @@ const Reader: React.FC = () => {
 
   const handleShareVerse = async (verse: Verse) => {
     const reference = `${currentBook?.abbreviation || currentBook?.name || 'Livro'} ${currentChapter}, ${verse.number}`;
-    const messageRaw = `Olha essa passagem que li no app Sanctus: ${reference} — ${verse.text}`;
+    const messageRaw = `Olha essa passagem que li no app Sanctus: ${reference} — ${verse.text}\nAcesse o app pelo link: https://sanctus-app.vercel.app/`;
     setShareRef(reference);
     setShareText(verse.text);
     try {
@@ -252,7 +244,7 @@ const Reader: React.FC = () => {
     return <div className="p-8 text-center text-stone-500">Livro ou capítulo não encontrado.</div>;
   }
 
-  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Olha essa passagem que li no app Sanctus: ${shareRef} — ${shareText}`)}`;
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Olha essa passagem que li no app Sanctus: ${shareRef} — ${shareText}\nAcesse o app pelo link: https://sanctus-app.vercel.app/`)}`;
 
   return (
     <div className={`h-full flex flex-col relative ${lectioMode ? 'z-50 bg-paper-light dark:bg-paper-dark absolute inset-0' : ''}`}>
