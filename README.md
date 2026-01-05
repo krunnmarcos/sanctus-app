@@ -1,7 +1,3 @@
-﻿<div align="center">
-  <img width="100%" alt="Acutis Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
 # Acutis
 
 Acutis é um app web em React para leitura da Bíblia (tradução Ave Maria), prática guiada de Lectio Divina e diário espiritual, com foco em uso local (dados em `public`) e persistência via `localStorage`.
