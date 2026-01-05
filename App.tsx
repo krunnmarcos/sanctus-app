@@ -9,7 +9,8 @@ import {
   Bookmark, 
   ChevronRight,
   Sparkles,
-  Info
+  Info,
+  CalendarDays
 } from 'lucide-react';
 import { MOCK_BIBLE, PATRISTIC_COMMENTS, loadBibleFromStatic } from './constants';
 import { 
@@ -25,6 +26,7 @@ import Journal from './components/Journal';
 import Dashboard from './components/Dashboard';
 import LectioDivina from './components/LectioDivina.tsx';
 import About from './components/About';
+import LiturgiaDiaria from './components/LiturgiaDiaria';
 
 // --- Global Context for simplicity in this artifact ---
 // In a real app, this would be in a separate file.
@@ -246,6 +248,14 @@ const App: React.FC = () => {
               </button>
 
               <button 
+                onClick={() => { setView('liturgia'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${view === 'liturgia' ? 'bg-gold-50 text-gold-700 dark:bg-gold-900/20 dark:text-gold-200' : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'}`}
+              >
+                <CalendarDays size={18} />
+                <span className="font-medium">Liturgia Diária</span>
+              </button>
+
+              <button 
                 onClick={() => { setView('about'); setSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${view === 'about' ? 'bg-gold-50 text-gold-700 dark:bg-gold-900/20 dark:text-gold-200' : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'}`}
               >
@@ -334,7 +344,7 @@ const App: React.FC = () => {
               <Menu size={20} />
             </button>
             <h1 className="font-display text-lg font-semibold text-stone-900 dark:text-stone-100">
-              {view === 'reader' ? currentBook?.name : view === 'journal' ? 'Diário' : view === 'lectio' ? 'Lectio Divina' : view === 'about' ? 'Sobre o Acutis' : 'Acutis'}
+              {view === 'reader' ? currentBook?.name : view === 'journal' ? 'Diário' : view === 'lectio' ? 'Lectio Divina' : view === 'liturgia' ? 'Liturgia Diária' : view === 'about' ? 'Sobre o Acutis' : 'Acutis'}
             </h1>
             <img
               src="/assets/logos/logo%20navbar%20compact.png"
@@ -390,6 +400,7 @@ const App: React.FC = () => {
             {view === 'reader' && <Reader />}
             {view === 'journal' && <Journal />}
             {view === 'lectio' && <LectioDivina />}
+            {view === 'liturgia' && <LiturgiaDiaria />}
             {view === 'about' && <About />}
           </main>
 
