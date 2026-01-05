@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import { AppContext } from '../App';
 
-const BASE_URL = 'http://liturgia.up.railway.app/v2/';
+// API pública; usar HTTPS para evitar bloqueio de mixed-content em produção (Vercel)
+const BASE_URL = 'https://liturgia.up.railway.app/v2/';
 
 type OpcaoLeitura = {
   referencia?: string;
@@ -96,7 +97,10 @@ const LiturgiaDiaria: React.FC = () => {
     setErro(null);
     const url = isoDate ? `${BASE_URL}?data=${isoDate}` : BASE_URL;
     try {
-      const res = await fetch(url);
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timer);
       if (!res.ok) {
         throw new Error('Resposta inválida da API');
       }
@@ -107,7 +111,10 @@ const LiturgiaDiaria: React.FC = () => {
       setErro('Não foi possível carregar a liturgia.');
       if (isoDate) {
         try {
-          const fallbackRes = await fetch(BASE_URL);
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 8000);
+          const fallbackRes = await fetch(BASE_URL, { signal: controller.signal });
+          clearTimeout(timer);
           if (fallbackRes.ok) {
             const data = await fallbackRes.json();
             setLiturgia(data as LiturgiaPayload);
