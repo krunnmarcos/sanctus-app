@@ -2,10 +2,11 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/assets/logos/64x64.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/logos/32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/logos/logo%20navbar.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sanctus | Catholic Bible App</title>
+    <title>Acutis | Catholic Bible App</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,17 +22,41 @@
               display: ['Cinzel', 'serif'],
             },
             colors: {
+              santo: {
+                50: '#f3fbfc',
+                100: '#e6f6f7',
+                200: '#d8f0f2',
+                300: '#caeaec',
+                400: '#bde4e6',
+                500: '#a8dadc', // Santo do dia base
+                600: '#86c3c6',
+                700: '#6ca9ad',
+                800: '#538f93',
+                900: '#3c757a',
+              },
               gold: {
-                50: '#fbf8eb',
-                100: '#f5efce',
-                200: '#ecdd9a',
-                300: '#e2c562',
-                400: '#daa936',
-                500: '#b8860b', // Base Gold
-                600: '#a16d09',
-                700: '#82520c',
-                800: '#6d4212',
-                900: '#5c3814',
+                50: '#e6f1ff',
+                100: '#cce4ff',
+                200: '#99c9ff',
+                300: '#66adff',
+                400: '#3392ff',
+                500: '#007bff', // Base Blue
+                600: '#0064d6',
+                700: '#004da6',
+                800: '#003875',
+                900: '#00274f',
+              },
+              indigo: {
+                50: '#ffe9eb',
+                100: '#ffced2',
+                200: '#fba5aa',
+                300: '#f36d78',
+                400: '#ea4a57',
+                500: '#e63946', // Base Red
+                600: '#d12f3c',
+                700: '#b12532',
+                800: '#8d1f2a',
+                900: '#6c1922',
               },
               paper: {
                 light: '#FAF9F6', // Off-white

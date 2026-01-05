@@ -1,10 +1,10 @@
 ﻿<div align="center">
-  <img width="100%" alt="Sanctus Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+  <img width="100%" alt="Acutis Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
 </div>
 
-# Sanctus
+# Acutis
 
-Sanctus é um app web em React para leitura da Bíblia (Vulgata/PorBLivre), prática guiada de Lectio Divina e diário espiritual, com foco em uso local (dados em `public`) e persistência via `localStorage`.
+Acutis é um app web em React para leitura da Bíblia (Vulgata/PorBLivre), prática guiada de Lectio Divina e diário espiritual, com foco em uso local (dados em `public`) e persistência via `localStorage`.
 
 Aplicação React/Vite para leitura bíblica, Lectio Divina guiada e diário espiritual. O projeto usa apenas front-end (sem backend), com persistência local via `localStorage` e dados estáticos (Vulgata e PorBLivre) embarcados na pasta `public`.
 
@@ -21,7 +21,7 @@ Aplicação React/Vite para leitura bíblica, Lectio Divina guiada e diário esp
 - [Ideias de Evolução](#ideias-de-evolução)
 
 ## Visão Geral
-Sanctus oferece uma experiência devocional completa:
+Acutis oferece uma experiência devocional completa:
 - Leitura bíblica com destaques, comentários patrísticos e navegação por capítulos/livros.
 - Modo Lectio Divina com etapas clássicas (Lectio, Meditatio, Oratio, Contemplatio, Actio) e histórico local das sessões anteriores.
 - Diário de oração simples (com placeholders para evolução futura).
@@ -96,7 +96,7 @@ Não há variáveis de ambiente obrigatórias no fluxo atual. O app é totalment
 ```
 
 ## Como publicar no GitHub
-Repositório alvo: https://github.com/krunnmarcos/sanctus-app.git.
+Repositório alvo: https://github.com/krunnmarcos/acutis-app.git.
 
 1. Inicialize (caso ainda não exista `.git`):
 ```bash
@@ -110,7 +110,7 @@ git commit -m "chore: initial import"
 3. Configure a branch principal e o remoto:
 ```bash
 git branch -M main
-git remote add origin https://github.com/krunnmarcos/sanctus-app.git
+git remote add origin https://github.com/krunnmarcos/acutis-app.git
 ```
 4. Envie o código:
 ```bash

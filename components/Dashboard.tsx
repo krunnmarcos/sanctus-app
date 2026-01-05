@@ -244,7 +244,7 @@ const Dashboard: React.FC = () => {
         const data = await resp.json();
         const nome = data?.santo || SANTOS_MOCK[chave]?.nome || 'Santo Agostinho';
         const tituloApi = extrairTitulo(data?.sobre_santo) || SANTOS_MOCK[chave]?.titulo || 'Bispo e Doutor da Igreja';
-        const descricaoApi = extrairDescricaoCurta(data?.sobre_santo) || SANTOS_MOCK[chave]?.descricao || 'Patrono do Sanctus Augustinus. Grande teólogo e filósofo da Igreja.';
+        const descricaoApi = extrairDescricaoCurta(data?.sobre_santo) || SANTOS_MOCK[chave]?.descricao || 'Patrono do Acutis. Grande teólogo e filósofo da Igreja.';
         const { urlDireta } = gerarUrlWikipedia(nome);
         setSanto({ nome, titulo: tituloApi, descricao: descricaoApi, dataLabel: formatDateLabel(hoje), url: urlDireta });
       } catch (err) {
@@ -323,7 +323,7 @@ const Dashboard: React.FC = () => {
     return "Boa noite";
   };
 
-  const shareMessageRaw = `Olha essa passagem que li no app Sanctus: ${heroReference} - ${heroText}\nAcesse o app pelo link: https://sanctus-app.vercel.app/`;
+  const shareMessageRaw = `Olha essa passagem que li no app Acutis: ${heroReference} - ${heroText}\nAcesse o app pelo link: https://acutis-app.vercel.app/`;
   const shareMessage = encodeURIComponent(shareMessageRaw);
   const whatsappUrl = `https://api.whatsapp.com/send?text=${shareMessage}`;
 
@@ -335,13 +335,13 @@ const Dashboard: React.FC = () => {
 
       const supportsWebShare = typeof navigator !== 'undefined' && !!navigator.canShare;
       if (supportsWebShare && img) {
-        const file = await dataUrlToFile(img, 'sanctus-compartilhar.png');
+        const file = await dataUrlToFile(img, 'acutis-compartilhar.png');
         const canShareFile = navigator.canShare && navigator.canShare({ files: [file] });
         if (canShareFile) {
           await navigator.share({
             files: [file],
             text: shareMessageRaw,
-            title: 'Sanctus',
+            title: 'Acutis',
           });
           return; // Compartilhado via Web Share, não abre modal
         }
@@ -473,9 +473,9 @@ const Dashboard: React.FC = () => {
 
         {/* Santo do Dia */}
         <section aria-label="Santo do Dia" className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-amber-200/70 dark:border-stone-800 shadow-sm p-6 flex flex-col md:flex-row md:items-center gap-5">
+          <div className="rounded-2xl bg-white dark:bg-stone-900 border border-santo-200/70 dark:border-santo-700/60 shadow-sm p-6 flex flex-col md:flex-row md:items-center gap-5">
             <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-amber-700 dark:text-amber-300 font-semibold">
+              <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-santo-700 dark:text-santo-200 font-semibold">
                 <Sparkles size={14} />
                 <span>Santo do Dia</span>
                 <span className="text-stone-400 dark:text-stone-500">{santo?.dataLabel || formatDateLabel(new Date())}</span>
@@ -489,7 +489,7 @@ const Dashboard: React.FC = () => {
               ) : santo ? (
                 <>
                   <h3 className="font-serif text-2xl text-stone-900 dark:text-stone-100">{santo.nome}</h3>
-                  <p className="text-sm text-amber-800 dark:text-amber-300 font-semibold">{santo.titulo}</p>
+                  <p className="text-sm text-santo-800 dark:text-santo-200 font-semibold">{santo.titulo}</p>
                   <p className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed max-w-2xl">{santo.descricao}</p>
                   <div className="pt-2">
                     <a
@@ -497,7 +497,7 @@ const Dashboard: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Ler biografia completa de ${santo.nome} na Wikipedia`}
-                      className="inline-flex items-center gap-2 text-sm font-semibold text-amber-700 dark:text-amber-300 hover:text-amber-800"
+                      className="inline-flex items-center gap-2 text-sm font-semibold text-santo-700 dark:text-santo-200 hover:text-santo-800"
                     >
                       Saber mais na Wikipedia
                       <ExternalLink size={14} />
@@ -511,7 +511,7 @@ const Dashboard: React.FC = () => {
                 <p className="text-sm text-stone-600 dark:text-stone-300">Não foi possível carregar o santo do dia.</p>
               )}
             </div>
-            <div className="w-20 h-20 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 flex items-center justify-center text-amber-700 dark:text-amber-300 shadow-inner">
+            <div className="w-20 h-20 rounded-full bg-santo-50 dark:bg-santo-900/20 border border-santo-200 dark:border-santo-800 flex items-center justify-center text-santo-700 dark:text-santo-200 shadow-inner">
               <Cross size={32} />
             </div>
           </div>
@@ -560,7 +560,7 @@ const Dashboard: React.FC = () => {
                 {shareImage && (
                   <a
                     href={shareImage}
-                    download="sanctus-compartilhar.png"
+                    download="acutis-compartilhar.png"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-900 text-white font-semibold hover:bg-stone-800"
                   >
                     <Download size={16} />

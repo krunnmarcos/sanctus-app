@@ -214,7 +214,7 @@ const Reader: React.FC = () => {
 
   const handleShareVerse = async (verse: Verse) => {
     const reference = `${currentBook?.abbreviation || currentBook?.name || 'Livro'} ${currentChapter}, ${verse.number}`;
-    const messageRaw = `Olha essa passagem que li no app Sanctus: ${reference} — ${verse.text}\nAcesse o app pelo link: https://sanctus-app.vercel.app/`;
+    const messageRaw = `Olha essa passagem que li no app Acutis: ${reference} — ${verse.text}\nAcesse o app pelo link: https://acutis-app.vercel.app/`;
     setShareRef(reference);
     setShareText(verse.text);
     try {
@@ -224,10 +224,10 @@ const Reader: React.FC = () => {
 
       const supportsWebShare = typeof navigator !== 'undefined' && !!navigator.canShare;
       if (supportsWebShare && img) {
-        const file = await dataUrlToFile(img, 'sanctus-compartilhar.png');
+        const file = await dataUrlToFile(img, 'acutis-compartilhar.png');
         const canShareFile = navigator.canShare && navigator.canShare({ files: [file] });
         if (canShareFile) {
-          await navigator.share({ files: [file], text: messageRaw, title: 'Sanctus' });
+          await navigator.share({ files: [file], text: messageRaw, title: 'Acutis' });
           return;
         }
       }
@@ -244,7 +244,7 @@ const Reader: React.FC = () => {
     return <div className="p-8 text-center text-stone-500">Livro ou capítulo não encontrado.</div>;
   }
 
-  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Olha essa passagem que li no app Sanctus: ${shareRef} — ${shareText}\nAcesse o app pelo link: https://sanctus-app.vercel.app/`)}`;
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`Olha essa passagem que li no app Acutis: ${shareRef} — ${shareText}\nAcesse o app pelo link: https://acutis-app.vercel.app/`)}`;
 
   return (
     <div className={`h-full flex flex-col relative ${lectioMode ? 'z-50 bg-paper-light dark:bg-paper-dark absolute inset-0' : ''}`}>
@@ -505,7 +505,7 @@ const Reader: React.FC = () => {
                 {shareImage && (
                   <a
                     href={shareImage}
-                    download="sanctus-compartilhar.png"
+                    download="acutis-compartilhar.png"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-stone-900 text-white font-semibold hover:bg-stone-800"
                   >
                     <Download size={16} />

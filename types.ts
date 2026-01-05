@@ -1,4 +1,4 @@
-export type ViewState = 'dashboard' | 'reader' | 'journal' | 'lectio' | 'settings';
+export type ViewState = 'dashboard' | 'reader' | 'journal' | 'lectio' | 'settings' | 'about';
 
 export interface Verse {
   id: string; // e.g., "GEN:1:1"

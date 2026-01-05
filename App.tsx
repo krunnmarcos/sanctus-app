@@ -8,8 +8,8 @@ import {
   Feather, 
   Bookmark, 
   ChevronRight,
-  Cross,
-  Sparkles
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { MOCK_BIBLE, PATRISTIC_COMMENTS, loadBibleFromStatic } from './constants';
 import { 
@@ -24,6 +24,7 @@ import Reader from './components/Reader';
 import Journal from './components/Journal';
 import Dashboard from './components/Dashboard';
 import LectioDivina from './components/LectioDivina.tsx';
+import About from './components/About';
 
 // --- Global Context for simplicity in this artifact ---
 // In a real app, this would be in a separate file.
@@ -201,11 +202,13 @@ const App: React.FC = () => {
         `}>
           <div className="h-full flex flex-col">
             <div className="p-6 border-b border-stone-100 dark:border-stone-800 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-gold-500 text-white flex items-center justify-center">
-                <Cross size={18} />
-              </div>
+              <img
+                src="/assets/logos/logo%20navbar.png"
+                alt="Logo Acutis"
+                className="h-10 w-10 rounded-full object-cover shadow-sm bg-white/60 dark:bg-white/10"
+              />
               <span className="font-display font-semibold text-xl tracking-wide text-stone-900 dark:text-stone-100">
-                Sanctus
+                Acutis
               </span>
             </div>
 
@@ -240,6 +243,14 @@ const App: React.FC = () => {
               >
                 <Sparkles size={18} />
                 <span className="font-medium">Lectio Divina</span>
+              </button>
+
+              <button 
+                onClick={() => { setView('about'); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${view === 'about' ? 'bg-gold-50 text-gold-700 dark:bg-gold-900/20 dark:text-gold-200' : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'}`}
+              >
+                <Info size={18} />
+                <span className="font-medium">Sobre o Acutis</span>
               </button>
 
               <div className="pt-5 pb-2 px-3 space-y-3">
@@ -323,9 +334,13 @@ const App: React.FC = () => {
               <Menu size={20} />
             </button>
             <h1 className="font-display text-lg font-semibold text-stone-900 dark:text-stone-100">
-              {view === 'reader' ? currentBook?.name : view === 'journal' ? 'Diário' : view === 'lectio' ? 'Lectio Divina' : 'Sanctus'}
+              {view === 'reader' ? currentBook?.name : view === 'journal' ? 'Diário' : view === 'lectio' ? 'Lectio Divina' : view === 'about' ? 'Sobre o Acutis' : 'Acutis'}
             </h1>
-            <div className="w-8" /> {/* Spacer */}
+            <img
+              src="/assets/logos/logo%20navbar%20compact.png"
+              alt="Logo Acutis"
+              className="h-9 w-9 rounded-full object-cover bg-white/70 dark:bg-white/10"
+            />
           </header>
 
           {showTopSearch && (
@@ -375,6 +390,7 @@ const App: React.FC = () => {
             {view === 'reader' && <Reader />}
             {view === 'journal' && <Journal />}
             {view === 'lectio' && <LectioDivina />}
+            {view === 'about' && <About />}
           </main>
 
         </div>
