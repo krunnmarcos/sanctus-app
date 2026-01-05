@@ -70,11 +70,11 @@ const App: React.FC = () => {
   const [prayers, setPrayers] = useState<Prayer[]>([]);
   const [progress, setProgress] = useState<ReadingProgress>({ bookId: 'GEN', chapter: 1 });
 
-  // Carrega Vulgata (banco real) e mantém MOCK_BIBLE como fallback
+  // Carrega Bíblia Ave Maria do disco e mantém MOCK_BIBLE como fallback
   useEffect(() => {
     loadBibleFromStatic()
       .then(setBible)
-      .catch((err) => console.warn('Falha ao carregar Vulgata, usando mock:', err));
+      .catch((err) => console.warn('Falha ao carregar Bíblia Ave Maria, usando mock:', err));
   }, []);
 
   // Initialize Theme

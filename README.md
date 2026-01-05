@@ -4,9 +4,9 @@
 
 # Acutis
 
-Acutis é um app web em React para leitura da Bíblia (Vulgata/PorBLivre), prática guiada de Lectio Divina e diário espiritual, com foco em uso local (dados em `public`) e persistência via `localStorage`.
+Acutis é um app web em React para leitura da Bíblia (tradução Ave Maria), prática guiada de Lectio Divina e diário espiritual, com foco em uso local (dados em `public`) e persistência via `localStorage`.
 
-Aplicação React/Vite para leitura bíblica, Lectio Divina guiada e diário espiritual. O projeto usa apenas front-end (sem backend), com persistência local via `localStorage` e dados estáticos (Vulgata e PorBLivre) embarcados na pasta `public`.
+Aplicação React/Vite para leitura bíblica, Lectio Divina guiada e diário espiritual. O projeto usa apenas front-end (sem backend), com persistência local via `localStorage` e dados estáticos (Bíblia Ave Maria) embarcados na pasta `public`.
 
 ## Sumário
 - [Visão Geral](#visão-geral)
@@ -28,7 +28,7 @@ Acutis oferece uma experiência devocional completa:
 - Dashboard com atalho para leitura, santo do dia e sugestões rápidas.
 
 ## Principais Funcionalidades
-- **Leitura bíblica**: seleção de livro/capítulo, avanço/retrocesso, fontes estáticas (Vulgata ou PorBLivre). Destaques por cor, marcação de versículo e indicação de comentários patrísticos.
+- **Leitura bíblica**: seleção de livro/capítulo, avanço/retrocesso, fonte estática (Bíblia Ave Maria). Destaques por cor, marcação de versículo e indicação de comentários patrísticos.
 - **Buscas**: filtro por livro e busca por texto de versículos (mínimo 3 caracteres) com resultado limitado para manter performance.
 - **Lectio Divina guiada**: timers para lectio/contemplatio, perguntas sugeridas em Meditatio, campo de oração (Oratio), compromisso prático (Actio) e salvamento em histórico local.
 - **Histórico de Lectio**: últimas sessões listadas; clicar abre modal detalhado com tempos, oratio, respostas e actio.
@@ -43,7 +43,7 @@ Acutis oferece uma experiência devocional completa:
   - components/LectioDivina.tsx: fluxo completo da Lectio, timers e histórico em `localStorage` (`lectio-draft-v1`, `lectio-history-v1`).
   - components/Dashboard.tsx: landing com santo do dia, call-to-action de leitura e seções rápidas.
   - components/Journal.tsx: diário (estrutura base, pronto para evoluir).
-- **Dados bíblicos**: carregamento prioritário da Vulgata em public/data/vulgata/bible.json; fallback para mock em constants.ts.
+- **Dados bíblicos**: carregamento prioritário da Bíblia Ave Maria em public/data/ave-maria/ave-maria.json; fallback para mock em constants.ts.
 
 ## Fluxos de Uso
 1) **Leitura diária**
@@ -64,7 +64,7 @@ Acutis oferece uma experiência devocional completa:
   - `lectio-draft-v1`: rascunho da sessão atual de Lectio.
   - `lectio-history-v1`: histórico das últimas sessões (limitado a 50).
 - **Dados estáticos**:
-  - public/data/vulgata/bible.json e public/data/porblivre/bible.json (PorBLivre).
+  - public/data/ave-maria/ave-maria.json (tradução Ave Maria, offline).
 - **Mocks**: `MOCK_BIBLE` e `PATRISTIC_COMMENTS` em constants.ts para funcionamento offline.
 
 ## Execução Local
@@ -88,10 +88,10 @@ Não há variáveis de ambiente obrigatórias no fluxo atual. O app é totalment
 .
  App.tsx                 # Contexto global e layout principal
  components/             # Páginas/áreas principais (Dashboard, Reader, LectioDivina, Journal)
- public/data/            # Bíblias estáticas (vulgata, porblivre)
+ public/data/            # Bíblia estática (Ave Maria)
  constants.ts            # Dados mock, comentários patrísticos, utilitários
  types.ts                # Tipagens globais
- scripts/convert-porblivre.js # Utilitário de conversão (PorBLivre)
+ scripts/convert-porblivre.js # Utilitário de conversão (legado/PorBLivre)
  vite.config.ts          # Configuração Vite
 ```
 

@@ -246,8 +246,147 @@ export const PATRISTIC_COMMENTS: Record<string, PatristicComment[]> = {
   ]
 };
 
+type AveMariaVerse = {
+  versiculo: number;
+  texto: string;
+};
+
+type AveMariaChapter = {
+  capitulo: number;
+  versiculos: AveMariaVerse[];
+};
+
+type AveMariaBook = {
+  nome: string;
+  abreviacao: string;
+  quantidade_capitulos: number;
+  capitulos: AveMariaChapter[];
+};
+
+type AveMariaBible = Record<string, AveMariaBook>;
+
+// Mapeia chaves do JSON Ave Maria para ids/categorias internas
+const AVE_MARIA_META: Record<string, { id: string; category: Book['category']; abbreviation?: string; name?: string }> = {
+  Gn: { id: 'GEN', category: 'Pentateuco' },
+  Ex: { id: 'EX', category: 'Pentateuco' },
+  Lv: { id: 'LV', category: 'Pentateuco' },
+  Nm: { id: 'NM', category: 'Pentateuco' },
+  Dt: { id: 'DT', category: 'Pentateuco' },
+  Js: { id: 'JS', category: 'Históricos' },
+  Jz: { id: 'JZ', category: 'Históricos' },
+  Rt: { id: 'RT', category: 'Históricos' },
+  '1Sm': { id: '1SM', category: 'Históricos' },
+  '2Sm': { id: '2SM', category: 'Históricos' },
+  '1Rs': { id: '1RS', category: 'Históricos' },
+  '2Rs': { id: '2RS', category: 'Históricos' },
+  '1Cr': { id: '1CR', category: 'Históricos' },
+  '2Cr': { id: '2CR', category: 'Históricos' },
+  Ed: { id: 'ED', category: 'Históricos', name: 'Esdras', abbreviation: 'Ed' },
+  Ne: { id: 'NE', category: 'Históricos' },
+  Tb: { id: 'TB', category: 'Históricos' },
+  Jt: { id: 'JDT', category: 'Históricos', name: 'Judite', abbreviation: 'Jt' },
+  Et: { id: 'ET', category: 'Históricos', name: 'Ester', abbreviation: 'Et' },
+  Jó: { id: 'JOB', category: 'Sapienciais', abbreviation: 'Jó' },
+  Sl: { id: 'SL', category: 'Sapienciais' },
+  Pv: { id: 'PV', category: 'Sapienciais' },
+  Ec: { id: 'EC', category: 'Sapienciais' },
+  Ct: { id: 'CT', category: 'Sapienciais' },
+  Sb: { id: 'SB', category: 'Sapienciais' },
+  Eclo: { id: 'ECF', category: 'Sapienciais', name: 'Eclesiástico', abbreviation: 'Eclo' },
+  Is: { id: 'IS', category: 'Profetas' },
+  Jr: { id: 'JR', category: 'Profetas' },
+  Lm: { id: 'LM', category: 'Profetas' },
+  Br: { id: 'BR', category: 'Profetas', name: 'Baruc' },
+  Ez: { id: 'EZ', category: 'Profetas' },
+  Dn: { id: 'DN', category: 'Profetas' },
+  Os: { id: 'OS', category: 'Profetas' },
+  Jl: { id: 'JL', category: 'Profetas' },
+  Am: { id: 'AM', category: 'Profetas' },
+  Ab: { id: 'OB', category: 'Profetas', name: 'Abdias' },
+  Jn: { id: 'JN', category: 'Profetas' },
+  Mq: { id: 'MQ', category: 'Profetas' },
+  Na: { id: 'NA', category: 'Profetas' },
+  Hab: { id: 'HC', category: 'Profetas' },
+  Sf: { id: 'SF', category: 'Profetas' },
+  Ag: { id: 'AG', category: 'Profetas' },
+  Zc: { id: 'ZC', category: 'Profetas' },
+  Ml: { id: 'ML', category: 'Profetas' },
+  Mt: { id: 'MT', category: 'Evangelhos' },
+  Mc: { id: 'MC', category: 'Evangelhos' },
+  Lc: { id: 'LC', category: 'Evangelhos' },
+  Jo: { id: 'JO', category: 'Evangelhos' },
+  At: { id: 'AT', category: 'Históricos', name: 'Atos dos Apóstolos', abbreviation: 'At' },
+  Rm: { id: 'RM', category: 'Cartas' },
+  '1Co': { id: '1CO', category: 'Cartas' },
+  '2Co': { id: '2CO', category: 'Cartas' },
+  Gl: { id: 'GL', category: 'Cartas' },
+  Ef: { id: 'EF', category: 'Cartas' },
+  Fp: { id: 'FP', category: 'Cartas' },
+  Cl: { id: 'CL', category: 'Cartas' },
+  '1Ts': { id: '1TS', category: 'Cartas' },
+  '2Ts': { id: '2TS', category: 'Cartas' },
+  '1Tm': { id: '1TM', category: 'Cartas' },
+  '2Tm': { id: '2TM', category: 'Cartas' },
+  Tt: { id: 'TT', category: 'Cartas' },
+  Fm: { id: 'FM', category: 'Cartas' },
+  Hb: { id: 'HB', category: 'Cartas' },
+  Tg: { id: 'TG', category: 'Cartas' },
+  '1Pe': { id: '1PE', category: 'Cartas' },
+  '2Pe': { id: '2PE', category: 'Cartas' },
+  '1Jo': { id: '1JO', category: 'Cartas' },
+  '2Jo': { id: '2JO', category: 'Cartas' },
+  '3Jo': { id: '3JO', category: 'Cartas' },
+  Jd: { id: 'JD', category: 'Cartas' },
+  Ap: { id: 'AP', category: 'Apocalipse' },
+};
+
+const AVE_MARIA_ORDER = [
+  'Gn', 'Ex', 'Lv', 'Nm', 'Dt', 'Js', 'Jz', 'Rt', '1Sm', '2Sm', '1Rs', '2Rs', '1Cr', '2Cr',
+  'Ed', 'Ne', 'Tb', 'Jt', 'Et', 'Jó', 'Sl', '1Mc', '2Mc', 'Pv', 'Ec', 'Ct', 'Sb', 'Eclo',
+  'Is', 'Jr', 'Lm', 'Br', 'Ez', 'Dn', 'Os', 'Jl', 'Am', 'Ab', 'Jn', 'Mq', 'Na', 'Hab', 'Sf', 'Ag', 'Zc', 'Ml',
+  'Mt', 'Mc', 'Lc', 'Jo', 'At', 'Rm', '1Co', '2Co', 'Gl', 'Ef', 'Fp', 'Cl', '1Ts', '2Ts', '1Tm', '2Tm', 'Tt', 'Fm', 'Hb', 'Tg', '1Pe', '2Pe', '1Jo', '2Jo', '3Jo', 'Jd', 'Ap'
+];
+
+const convertAveMariaBible = (raw: AveMariaBible): Book[] => {
+  const orderedKeys = [
+    ...AVE_MARIA_ORDER.filter((key) => raw[key]),
+    ...Object.keys(raw).filter((key) => !AVE_MARIA_ORDER.includes(key))
+  ];
+
+  return orderedKeys.map((key) => {
+    const book = raw[key];
+    const meta = AVE_MARIA_META[key] ?? { id: key.toUpperCase(), category: 'Históricos' as Book['category'] };
+    const bookId = meta.id;
+    const abbreviation = meta.abbreviation ?? book?.abreviacao ?? meta.id;
+    const name = meta.name ?? book?.nome ?? key;
+
+    const chapters = (book?.capitulos ?? []).map((chapter) => {
+      const chapterNumber = chapter?.capitulo ?? 0;
+      return {
+        number: chapterNumber,
+        verses: (chapter?.versiculos ?? []).map((verse, idx) => {
+          const verseNumber = verse?.versiculo ?? idx + 1;
+          return {
+            id: `${bookId}:${chapterNumber}:${verseNumber}`,
+            number: verseNumber,
+            text: verse?.texto ?? ''
+          };
+        })
+      };
+    });
+
+    return {
+      id: bookId,
+      name,
+      abbreviation,
+      category: meta.category,
+      chapters,
+    };
+  });
+};
+
 // Caminho default para a Bíblia carregada de JSON estático
-const DEFAULT_BIBLE_PATH = '/data/porblivre/bible.json';
+const DEFAULT_BIBLE_PATH = '/data/ave-maria/ave-maria.json';
 
 export const loadBibleFromStatic = async (path: string = DEFAULT_BIBLE_PATH): Promise<Book[]> => {
   const res = await fetch(path);
@@ -255,5 +394,14 @@ export const loadBibleFromStatic = async (path: string = DEFAULT_BIBLE_PATH): Pr
     throw new Error(`Falha ao carregar Bíblia em ${path}`);
   }
   const data = await res.json();
-  return data as Book[];
+
+  if (Array.isArray(data)) {
+    return data as Book[];
+  }
+
+  if (data && typeof data === 'object') {
+    return convertAveMariaBible(data as AveMariaBible);
+  }
+
+  throw new Error('Formato de Bíblia desconhecido');
 };

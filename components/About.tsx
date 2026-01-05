@@ -207,6 +207,7 @@ const About: React.FC = () => {
             <p className="text-xs uppercase tracking-[0.25em] text-santo-200 font-semibold">Sobre o app</p>
             <h3 className="text-2xl font-display font-semibold">Acutis App</h3>
             <ul className="space-y-2 text-sm text-stone-200">
+              <li>• Bíblia: tradução Ave Maria (dados locais em modo offline)</li>
               <li>• Nossa missão</li>
               <li>• Política de privacidade</li>
               <li>• Contato e feedback</li>
